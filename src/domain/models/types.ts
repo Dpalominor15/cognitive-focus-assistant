@@ -31,15 +31,22 @@ export interface Goal {
   journal: JournalEntry[];
   
   category: 'health' | 'work' | 'learning' | 'mindset';
-
+  
   // Para saber si ya cobramos el castigo
   penaltyApplied?: boolean;
+
+  completedAt?: string; // Fecha ISO de cuando se completó al 100%
 }
 
 export interface UserStats {
   level: number;
   xp: number;
   totalFocusTime: number; // Minutos
+
+  // --- NUEVAS PROPIEDADES ---
+  currentStreak: number; // Racha de días seguidos usando la app
+  longestStreak: number; // Récord histórico
+  lastActiveDate?: string; // Para calcular la racha
   
   // Métricas avanzadas
   dailyGoalsCompleted: number;

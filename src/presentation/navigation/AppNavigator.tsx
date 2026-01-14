@@ -5,15 +5,16 @@ import { HomeScreen } from '../screens/HomeScreen';
 import { StatsScreen } from '../screens/StatsScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
 import { LoginScreen } from '../screens/LoginScreen';
+import { CalendarScreen } from '../screens/CalendarScreen'; // <--- 1. IMPORTAR
 import { useApp } from '../context/AppContext';
-import { Text } from 'react-native'; // Simple text icon replacement for speed
+import { Text } from 'react-native'; 
 
 const Tab = createBottomTabNavigator();
 
 export const AppNavigator = () => {
   const { userName, loading } = useApp();
 
-  if (loading) return null; // O un splash screen
+  if (loading) return null; 
 
   if (!userName) {
     return <LoginScreen />;
@@ -41,6 +42,16 @@ export const AppNavigator = () => {
             tabBarIcon: ({color}) => <Text style={{color, fontSize: 20}}>⚔️</Text>
           }}
         />
+        
+        {/* --- 2. NUEVA PESTAÑA CALENDARIO --- */}
+        <Tab.Screen 
+          name="Calendario" 
+          component={CalendarScreen} 
+          options={{
+            tabBarIcon: ({color}) => <Text style={{color, fontSize: 20}}>📆</Text>
+          }}
+        />
+
         <Tab.Screen 
           name="Datos" 
           component={StatsScreen} 
@@ -49,7 +60,7 @@ export const AppNavigator = () => {
           }}
         />
         <Tab.Screen 
-          name="Base" 
+          name="Menu" 
           component={ProfileScreen} 
           options={{
             tabBarIcon: ({color}) => <Text style={{color, fontSize: 20}}>👤</Text>

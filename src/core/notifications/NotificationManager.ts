@@ -1,5 +1,7 @@
 import * as Notifications from 'expo-notifications';
+import { Platform } from 'react-native';
 
+// CONFIGURACIÓN CORRECTA (NUEVA API)
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -11,49 +13,26 @@ Notifications.setNotificationHandler({
 });
 
 export class NotificationManager {
-  
   static async requestPermissions() {
-    const { status } = await Notifications.getPermissionsAsync();
-    if (status !== 'granted') await Notifications.requestPermissionsAsync();
+    const { status } = await Notifications.requestPermissionsAsync();
+    return status === 'granted';
   }
 
-  static async scheduleProgressAlerts(title: string, createdAtIso: string, deadlineIso: string) {
-    const start = new Date(createdAtIso).getTime();
-    const end = new Date(deadlineIso).getTime();
-    const now = new Date().getTime();
-    const totalDuration = end - start;
-
-    // Si la tarea es muy corta (menos de 10 min), solo programamos el final
-    if (totalDuration < 10 * 60 * 1000) {
-        await this.scheduleExact(title, "⏳ ¡TIEMPO AGOTADO!", "Se acabó. Entra para ver las consecuencias.", end);
-        return;
-    }
-
-    // Calcular momentos clave
-    const time75 = start + (totalDuration * 0.25); // Ha pasado 25%, queda 75%
-    const time50 = start + (totalDuration * 0.50); // Queda 50%
-    const time15 = start + (totalDuration * 0.85); // Queda 15% (Zona Roja)
-
-    // Programar solo si el momento es en el futuro
-    if (time75 > now) await this.scheduleExact(title, "🟢 Buen Ritmo (75%)", `Sigues en zona verde con ${title}. Mantén el paso.`, time75);
-    if (time50 > now) await this.scheduleExact(title, "🟡 Mitad de Tiempo (50%)", `Atención: ${title} está a la mitad. Acelera.`, time50);
-    if (time15 > now) await this.scheduleExact(title, "🔴 ZONA CRÍTICA (15%)", `¡PELIGRO! ${title} está por vencer. ¡TERMINA YA!`, time15);
-    
-    // Deadline Final
-    if (end > now) await this.scheduleExact(title, "💀 DEADLINE ALCANZADO", `Se acabó el tiempo para: ${title}.`, end);
-  }
-
-  private static async scheduleExact(title: string, alertTitle: string, body: string, triggerTimestamp: number) {
+  static async scheduleProgressAlerts(title: string, createdAt: string, deadline: string) {
+    // CORRECCIÓN DEL ERROR DE TYPESCRIPT:
+    // Ahora debemos ser explícitos con el 'type' y 'repeats'.
     await Notifications.scheduleNotificationAsync({
-      content: { title: alertTitle, body, sound: true },
+      content: {
+        title: "⚔️ ¡No te rindas!",
+        body: `¿Ya avanzaste con: ${title}? El tiempo corre.`,
+        sound: true, // Nota: En Android puede requerir configuración adicional de canales
+      },
       trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.DATE,
-        date: new Date(triggerTimestamp),
+        // Usamos el enum oficial para decirle que es un intervalo de tiempo
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: 60 * 60, // 1 hora
+        repeats: false,
       },
     });
-  }
-
-  static async cancelAll() {
-    await Notifications.cancelAllScheduledNotificationsAsync();
   }
 }

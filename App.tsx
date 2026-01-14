@@ -1,17 +1,48 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { View, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { AppTheme } from './src/core/theme';
+import { AppTheme } from './src/core/theme'; // Asegúrate de tener este archivo o usa un tema default
 import { AppProvider } from './src/presentation/context/AppContext';
-import { AppNavigator } from './src/presentation/navigation/AppNavigator'; // <--- EL NUEVO NAVIGATOR
+import { AppNavigator } from './src/presentation/navigation/AppNavigator';
+import * as Font from 'expo-font';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function App() {
+  const [appIsReady, setAppIsReady] = useState(false);
+
+  useEffect(() => {
+    async function prepare() {
+      try {
+        // Precargar fuentes de iconos para evitar parpadeos
+        await Font.loadAsync(MaterialCommunityIcons.font);
+        
+        // Aquí podrías precargar sonidos si quisieras
+        // await new Promise(resolve => setTimeout(resolve, 2000)); // Simular splash screen extra
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        setAppIsReady(true);
+      }
+    }
+
+    prepare();
+  }, []);
+
+  if (!appIsReady) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#000' }}>
+        <ActivityIndicator size="large" color="#6C63FF" />
+      </View>
+    );
+  }
+
   return (
     <SafeAreaProvider>
       <AppProvider>
         <PaperProvider theme={AppTheme}>
-          <StatusBar style="light" />
+          <StatusBar style="light" backgroundColor="#000" />
           <AppNavigator />
         </PaperProvider>
       </AppProvider>

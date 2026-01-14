@@ -1,7 +1,6 @@
 import { Audio } from 'expo-av';
 import * as Speech from 'expo-speech';
 
-// CORRECCIÓN: Usamos 3 retrocesos (../../../) en lugar de 4
 const SOUND_FILES = {
   success: require('../../../assets/sounds/success.mp3'),
   complete: require('../../../assets/sounds/complete.mp3'),
